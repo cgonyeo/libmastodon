@@ -31,14 +31,14 @@ type MastodonAPI =
     :> "api" :> "v1"
     :> "accounts"
     :> Capture "id" AccountID
-    :> Get '[JSON] Account
+    :> Get '[JSON] (Either Error Account)
 
     -- Getting the current user
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "accounts"
     :> "verify_credentials"
-    :> Get '[JSON] Account
+    :> Get '[JSON] (Either Error Account)
 
     -- Getting an account's followers
   :<|> Header "Authorization" T.Text
@@ -46,7 +46,7 @@ type MastodonAPI =
     :> "accounts"
     :> Capture "id" AccountID
     :> "followers"
-    :> Get '[JSON] [Account]
+    :> Get '[JSON] (Either Error [Account])
 
     -- Getting who account is following
   :<|> Header "Authorization" T.Text
@@ -54,7 +54,7 @@ type MastodonAPI =
     :> "accounts"
     :> Capture "id" AccountID
     :> "following"
-    :> Get '[JSON] [Account]
+    :> Get '[JSON] (Either Error [Account])
 
     -- Getting an account's statuses
   :<|> Header "Authorization" T.Text
@@ -64,7 +64,7 @@ type MastodonAPI =
     :> "statuses"
     :> QueryParam "only_media" Bool
     :> QueryParam "exclude_replies" Bool
-    :> Get '[JSON] [Status]
+    :> Get '[JSON] (Either Error [Status])
 
     -- Following/unfollowing an account
   :<|> Header "Authorization" T.Text
@@ -72,13 +72,13 @@ type MastodonAPI =
     :> "accounts"
     :> Capture "id" AccountID
     :> "follow"
-    :> Get '[JSON] Account
+    :> Get '[JSON] (Either Error Account)
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "accounts"
     :> Capture "id" AccountID
     :> "unfollow"
-    :> Get '[JSON] Account
+    :> Get '[JSON] (Either Error Account)
 
     -- Blocking/unblocking an account
   :<|> Header "Authorization" T.Text
@@ -86,13 +86,13 @@ type MastodonAPI =
     :> "accounts"
     :> Capture "id" AccountID
     :> "block"
-    :> Get '[JSON] Account
+    :> Get '[JSON] (Either Error Account)
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "accounts"
     :> Capture "id" AccountID
     :> "unblock"
-    :> Get '[JSON] Account
+    :> Get '[JSON] (Either Error Account)
 
     -- Muting/unmuting an account
   :<|> Header "Authorization" T.Text
@@ -100,20 +100,20 @@ type MastodonAPI =
     :> "accounts"
     :> Capture "id" AccountID
     :> "mute"
-    :> Get '[JSON] Account
+    :> Get '[JSON] (Either Error Account)
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "accounts"
     :> Capture "id" AccountID
     :> "unmute"
-    :> Get '[JSON] Account
+    :> Get '[JSON] (Either Error Account)
 
     -- Getting an account's relationships
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "accounts"
     :> "relationships"
-    :> Get '[JSON] [Relationship]
+    :> Get '[JSON] (Either Error [Relationship])
 
     -- Searching for accounts
   :<|> Header "Authorization" T.Text
@@ -122,7 +122,7 @@ type MastodonAPI =
     :> "search"
     :> QueryParam "q" T.Text
     :> QueryParam "limit" Int
-    :> Get '[JSON] [Account]
+    :> Get '[JSON] (Either Error [Account])
 
   -- Apps
 
@@ -130,7 +130,7 @@ type MastodonAPI =
   :<|> "api" :> "v1"
     :> "apps"
     :> ReqBody '[FormUrlEncoded] AppRegisterBody
-    :> Post '[JSON] AppRegistration
+    :> Post '[JSON] (Either Error AppRegistration)
 
   -- Blocks
 
@@ -138,7 +138,7 @@ type MastodonAPI =
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "blocks"
-    :> Get '[JSON] [Account]
+    :> Get '[JSON] (Either Error [Account])
 
   -- Favourites
 
@@ -146,7 +146,7 @@ type MastodonAPI =
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "favourites"
-    :> Get '[JSON] [Status]
+    :> Get '[JSON] (Either Error [Status])
 
   -- Follow Requests
 
@@ -154,7 +154,7 @@ type MastodonAPI =
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "follow_requests"
-    :> Get '[JSON] [Account]
+    :> Get '[JSON] (Either Error [Account])
 
     -- Authorizing or rejecting follow requests
   :<|> Header "Authorization" T.Text
@@ -162,13 +162,13 @@ type MastodonAPI =
     :> "follow_requests"
     :> "authorize"
     :> ReqBody '[FormUrlEncoded] FollowRequestBody
-    :> Post '[JSON] ()
+    :> Post '[JSON] (Either Error ())
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "follow_requests"
     :> "reject"
     :> ReqBody '[FormUrlEncoded] FollowRequestBody
-    :> Post '[JSON] ()
+    :> Post '[JSON] (Either Error ())
 
   -- Follows
 
@@ -177,7 +177,7 @@ type MastodonAPI =
     :> "api" :> "v1"
     :> "follows"
     :> ReqBody '[FormUrlEncoded] FollowBody
-    :> Post '[JSON] ()
+    :> Post '[JSON] (Either Error ())
  
   -- Instances
 
@@ -185,7 +185,7 @@ type MastodonAPI =
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "instance"
-    :> Get '[JSON] Instance
+    :> Get '[JSON] (Either Error Instance)
 
   -- Media
 
@@ -193,7 +193,7 @@ type MastodonAPI =
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "media"
-    :> Post '[JSON] Attachment -- TODO: form data
+    :> Post '[JSON] (Either Error Attachment) -- TODO: form data
 
   -- Mutes
 
@@ -201,7 +201,7 @@ type MastodonAPI =
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "mutes"
-    :> Get '[JSON] [Account]
+    :> Get '[JSON] (Either Error [Account])
 
   -- Notifications
 
@@ -209,19 +209,19 @@ type MastodonAPI =
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "notifications"
-    :> Get '[JSON] [Notification]
+    :> Get '[JSON] (Either Error [Notification])
     -- Getting a single notification
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "notifications"
     :> Capture "id" Int
-    :> Get '[JSON] Notification
+    :> Get '[JSON] (Either Error Notification)
     -- Clearing notifications
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "notifications"
     :> "clear"
-    :> Post '[JSON] ()
+    :> Post '[JSON] (Either Error ())
 
   -- Reports
 
@@ -229,13 +229,13 @@ type MastodonAPI =
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "reports"
-    :> Get '[JSON] [Report]
+    :> Get '[JSON] (Either Error [Report])
     -- Reporting a user
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "reports"
     :> ReqBody '[FormUrlEncoded] ReportBody
-    :> Post '[JSON] Report
+    :> Post '[JSON] (Either Error Report)
 
   -- Search
 
@@ -245,7 +245,7 @@ type MastodonAPI =
     :> "search"
     :> QueryParam "q" T.Text
     :> QueryParam "resolve" Bool
-    :> Get '[JSON] Results
+    :> Get '[JSON] (Either Error Results)
 
   -- Statuses
 
@@ -254,72 +254,72 @@ type MastodonAPI =
     :> "api" :> "v1"
     :> "statuses"
     :> Capture "id" Int
-    :> Get '[JSON] Status
+    :> Get '[JSON] (Either Error Status)
     -- Getting status context
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "statuses"
     :> Capture "id" Int
     :> "context"
-    :> Get '[JSON] Context
+    :> Get '[JSON] (Either Error Context)
     -- Getting a card associated with a status
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "statuses"
     :> Capture "id" Int
     :> "card"
-    :> Get '[JSON] Card
+    :> Get '[JSON] (Either Error Card)
     -- Getting who reblogged/favourited a status
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "statuses"
     :> Capture "id" Int
     :> "reblogged_by"
-    :> Get '[JSON] [Account]
+    :> Get '[JSON] (Either Error [Account])
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "statuses"
     :> Capture "id" Int
     :> "favourited_by"
-    :> Get '[JSON] [Account]
+    :> Get '[JSON] (Either Error [Account])
     -- Posting a new status
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "statuses"
     :> ReqBody '[FormUrlEncoded] NewStatusBody
-    :> Post '[JSON] Status
+    :> Post '[JSON] (Either Error Status)
     -- Deleting a status
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "statuses"
     :> Capture "id" Int
-    :> Delete '[JSON] ()
+    :> Delete '[JSON] (Either Error ())
     -- Reblogging/unreblogging a status
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "statuses"
     :> Capture "id" Int
     :> "reblog"
-    :> Post '[JSON] Status
+    :> Post '[JSON] (Either Error Status)
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "statuses"
     :> Capture "id" Int
     :> "unreblog"
-    :> Post '[JSON] Status
+    :> Post '[JSON] (Either Error Status)
     -- Favouriting/unfavouriting a status
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "statuses"
     :> Capture "id" Int
     :> "favourite"
-    :> Post '[JSON] Status
+    :> Post '[JSON] (Either Error Status)
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "statuses"
     :> Capture "id" Int
     :> "unfavourite"
-    :> Post '[JSON] Status
+    :> Post '[JSON] (Either Error Status)
 
   -- Timelines
 
@@ -328,20 +328,20 @@ type MastodonAPI =
     :> "api" :> "v1"
     :> "timeline"
     :> "home"
-    :> Get '[JSON] [Status]
+    :> Get '[JSON] (Either Error [Status])
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "timeline"
     :> "public"
     :> QueryParam "local" Bool
-    :> Get '[JSON] [Status]
+    :> Get '[JSON] (Either Error [Status])
   :<|> Header "Authorization" T.Text
     :> "api" :> "v1"
     :> "timeline"
     :> "tag"
     :> Capture "hashtag" T.Text
     :> QueryParam "local" Bool
-    :> Get '[JSON] [Status]
+    :> Get '[JSON] (Either Error [Status])
 
 -- JSON objects used in the API
 
@@ -659,49 +659,49 @@ instance FromJSON AppRegistration
 appRegToAppInfo :: T.Text -> AppRegistration -> AppInfo
 appRegToAppInfo server (AppRegistration i c s _) = AppInfo i c s server "TODO: replace me"
 
-getAccount          :: Maybe T.Text -> AccountID -> ClientM Account
-getCurrentUser      :: Maybe T.Text -> ClientM Account
-getFollowers        :: Maybe T.Text -> AccountID -> ClientM [Account]
-getFollowing        :: Maybe T.Text -> AccountID -> ClientM [Account]
-getStatuses         :: Maybe T.Text -> AccountID -> Maybe Bool -> Maybe Bool -> ClientM [Status]
-followAccount       :: Maybe T.Text -> AccountID -> ClientM Account
-unfollowAccount     :: Maybe T.Text -> AccountID -> ClientM Account
-blockAccount        :: Maybe T.Text -> AccountID -> ClientM Account
-unblockAccount      :: Maybe T.Text -> AccountID -> ClientM Account
-muteAccount         :: Maybe T.Text -> AccountID -> ClientM Account
-unmuteAccount       :: Maybe T.Text -> AccountID -> ClientM Account
-getRelationships    :: Maybe T.Text -> ClientM [Relationship]
-searchAccounts      :: Maybe T.Text -> Maybe T.Text -> Maybe Int -> ClientM [Account]
-registerApp         :: AppRegisterBody -> ClientM AppRegistration
-getBlocks           :: Maybe T.Text -> ClientM [Account]
-getFavs             :: Maybe T.Text -> ClientM [Status]
-getFollowReqs       :: Maybe T.Text -> ClientM [Account]
-approveFollowReq    :: Maybe T.Text -> FollowRequestBody -> ClientM ()
-rejectFollowReq     :: Maybe T.Text -> FollowRequestBody -> ClientM ()
-followRemoteAccount :: Maybe T.Text -> FollowBody -> ClientM ()
-getInstanceInfo     :: Maybe T.Text -> ClientM Instance
-uploadMedia         :: Maybe T.Text -> ClientM Attachment -- TODO: form data
-getMutes            :: Maybe T.Text -> ClientM [Account]
-getNotifs           :: Maybe T.Text -> ClientM [Notification]
-getSingleNotif      :: Maybe T.Text -> Int -> ClientM Notification
-clearNotifs         :: Maybe T.Text -> ClientM ()
-getReports          :: Maybe T.Text -> ClientM [Report]
-makeReport          :: Maybe T.Text -> ReportBody -> ClientM Report
-search              :: Maybe T.Text -> Maybe T.Text -> Maybe Bool -> ClientM Results
-getStatus           :: Maybe T.Text -> Int -> ClientM Status
-getStatusContext    :: Maybe T.Text -> Int -> ClientM Context
-getStatusCard       :: Maybe T.Text -> Int -> ClientM Card
-getStatusBoosters   :: Maybe T.Text -> Int -> ClientM [Account]
-getStatusFavers     :: Maybe T.Text -> Int -> ClientM [Account]
-makeNewStatus       :: Maybe T.Text -> NewStatusBody -> ClientM Status
-deleteStatus        :: Maybe T.Text -> Int -> ClientM ()
-boostStatus         :: Maybe T.Text -> Int -> ClientM Status
-unBoostStatus       :: Maybe T.Text -> Int -> ClientM Status
-favStatus           :: Maybe T.Text -> Int -> ClientM Status
-unFavStatus         :: Maybe T.Text -> Int -> ClientM Status
-getTimeline         :: Maybe T.Text -> ClientM [Status]
-getPubTimeline      :: Maybe T.Text -> Maybe Bool -> ClientM [Status]
-getTagTimeline      :: Maybe T.Text -> T.Text -> Maybe Bool -> ClientM [Status]
+getAccount          :: Maybe T.Text -> AccountID -> ClientM (Either Error Account)
+getCurrentUser      :: Maybe T.Text -> ClientM (Either Error Account)
+getFollowers        :: Maybe T.Text -> AccountID -> ClientM (Either Error [Account])
+getFollowing        :: Maybe T.Text -> AccountID -> ClientM (Either Error [Account])
+getStatuses         :: Maybe T.Text -> AccountID -> Maybe Bool -> Maybe Bool -> ClientM (Either Error [Status])
+followAccount       :: Maybe T.Text -> AccountID -> ClientM (Either Error Account)
+unfollowAccount     :: Maybe T.Text -> AccountID -> ClientM (Either Error Account)
+blockAccount        :: Maybe T.Text -> AccountID -> ClientM (Either Error Account)
+unblockAccount      :: Maybe T.Text -> AccountID -> ClientM (Either Error Account)
+muteAccount         :: Maybe T.Text -> AccountID -> ClientM (Either Error Account)
+unmuteAccount       :: Maybe T.Text -> AccountID -> ClientM (Either Error Account)
+getRelationships    :: Maybe T.Text -> ClientM (Either Error [Relationship])
+searchAccounts      :: Maybe T.Text -> Maybe T.Text -> Maybe Int -> ClientM (Either Error [Account])
+registerApp         :: AppRegisterBody -> ClientM (Either Error AppRegistration)
+getBlocks           :: Maybe T.Text -> ClientM (Either Error [Account])
+getFavs             :: Maybe T.Text -> ClientM (Either Error [Status])
+getFollowReqs       :: Maybe T.Text -> ClientM (Either Error [Account])
+approveFollowReq    :: Maybe T.Text -> FollowRequestBody -> ClientM (Either Error ())
+rejectFollowReq     :: Maybe T.Text -> FollowRequestBody -> ClientM (Either Error ())
+followRemoteAccount :: Maybe T.Text -> FollowBody -> ClientM (Either Error ())
+getInstanceInfo     :: Maybe T.Text -> ClientM (Either Error Instance)
+uploadMedia         :: Maybe T.Text -> ClientM (Either Error Attachment) -- TODO: form data
+getMutes            :: Maybe T.Text -> ClientM (Either Error [Account])
+getNotifs           :: Maybe T.Text -> ClientM (Either Error [Notification])
+getSingleNotif      :: Maybe T.Text -> Int -> ClientM (Either Error Notification)
+clearNotifs         :: Maybe T.Text -> ClientM (Either Error ())
+getReports          :: Maybe T.Text -> ClientM (Either Error [Report])
+makeReport          :: Maybe T.Text -> ReportBody -> ClientM (Either Error Report)
+search              :: Maybe T.Text -> Maybe T.Text -> Maybe Bool -> ClientM (Either Error Results)
+getStatus           :: Maybe T.Text -> Int -> ClientM (Either Error Status)
+getStatusContext    :: Maybe T.Text -> Int -> ClientM (Either Error Context)
+getStatusCard       :: Maybe T.Text -> Int -> ClientM (Either Error Card)
+getStatusBoosters   :: Maybe T.Text -> Int -> ClientM (Either Error [Account])
+getStatusFavers     :: Maybe T.Text -> Int -> ClientM (Either Error [Account])
+makeNewStatus       :: Maybe T.Text -> NewStatusBody -> ClientM (Either Error Status)
+deleteStatus        :: Maybe T.Text -> Int -> ClientM (Either Error ())
+boostStatus         :: Maybe T.Text -> Int -> ClientM (Either Error Status)
+unBoostStatus       :: Maybe T.Text -> Int -> ClientM (Either Error Status)
+favStatus           :: Maybe T.Text -> Int -> ClientM (Either Error Status)
+unFavStatus         :: Maybe T.Text -> Int -> ClientM (Either Error Status)
+getTimeline         :: Maybe T.Text -> ClientM (Either Error [Status])
+getPubTimeline      :: Maybe T.Text -> Maybe Bool -> ClientM (Either Error [Status])
+getTagTimeline      :: Maybe T.Text -> T.Text -> Maybe Bool -> ClientM (Either Error [Status])
 
 api :: S.Proxy MastodonAPI
 api = S.Proxy
